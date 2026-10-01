@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#171044">
+<title>Nakli Asli — Fake vs Real</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+:root{--sf:#ff9f1c;--mg:#e72c72;--mu:#c9c4df;--bd:rgba(255,255,255,.18);--gr:#44d483}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:#fff;font:16px system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(circle at 10% 10%,rgba(255,159,28,.22),transparent 30%),radial-gradient(circle at 90% 15%,rgba(231,44,114,.25),transparent 30%),linear-gradient(145deg,#100b35,#25134e 50%,#43133e) fixed}
+button,input{font:inherit}
+button{border:0;cursor:pointer;color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.app{max-width:760px;margin:0 auto;padding:12px;min-height:100vh;display:flex;flex-direction:column}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-weight:900;font-size:20px}
+.ib{width:42px;height:42px;border-radius:13px;background:rgba(255,255,255,.1);border:1px solid var(--bd);margin-left:6px}
+main{flex:1;display:flex;align-items:center}
+.card{width:100%;background:rgba(255,255,255,.1);border:1px solid var(--bd);border-radius:24px;padding:22px;box-shadow:0 18px 45px rgba(0,0,0,.3);animation:in .25s}
+@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.c{text-align:center}
+h1{font-size:clamp(38px,10vw,60px);margin:0;line-height:1;background:linear-gradient(90deg,#ffd166,#fff,#ff5b9d);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{margin:0 0 6px;font-size:clamp(24px,6vw,34px)}
+h3{margin:18px 0 8px}
+.mu{color:var(--mu)}.sm{font-size:13px}
+.btn{width:100%;min-height:52px;padding:12px 18px;border-radius:15px;font-weight:800;margin-top:10px}
+.p{background:linear-gradient(135deg,var(--sf),#ff6e5a);color:#26112c}
+.s{background:linear-gradient(135deg,var(--mg),#a62b91)}
+.g{background:rgba(255,255,255,.1);border:1px solid var(--bd)}
+input{width:100%;min-height:54px;border-radius:15px;border:1px solid var(--bd);background:rgba(0,0,0,.25);color:#fff;padding:12px 16px;font-size:17px;margin:6px 0 12px;outline:none}
+input:focus{border-color:var(--sf)}
+.code{text-transform:uppercase;letter-spacing:6px;text-align:center;font-weight:900;font-size:26px}
+.form{max-width:440px;margin:16px auto 0;text-align:left}
+.steps{display:grid;gap:10px;margin-top:8px;text-align:left}
+@media(min-width:620px){.steps{grid-template-columns:repeat(3,1fr)}.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:440px;margin:0 auto}}
+.box{background:rgba(0,0,0,.18);border:1px solid var(--bd);border-radius:16px;padding:13px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.rc{font-size:26px;letter-spacing:6px;font-weight:900;color:#ffd166;background:rgba(0,0,0,.2);padding:9px 14px;border-radius:14px}
+.pl{display:grid;gap:9px}
+.rnd{display:flex;gap:8px}
+.rnd button{flex:1;min-height:48px;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid var(--bd);font-weight:900}
+.rnd .on{border-color:var(--sf);color:#ffd166;background:rgba(255,159,28,.18)}
+.q{font-size:clamp(22px,5.5vw,34px);font-weight:900;line-height:1.2;margin:18px 0}
+.ok{background:rgba(68,212,131,.12);border:1px solid rgba(68,212,131,.3);border-radius:14px;padding:12px;line-height:1.5}
+.err{background:rgba(255,97,124,.13);border:1px solid rgba(255,97,124,.35);color:#ffd4dc;border-radius:14px;padding:12px;margin:12px 0;line-height:1.5}
+.ch{display:block;width:100%;min-height:62px;text-align:left;padding:13px 16px;margin-top:10px;border-radius:16px;border:1px solid var(--bd);background:rgba(0,0,0,.18);font-weight:700}
+.ch:hover:not(:disabled){border-color:var(--sf)}
+.ch:disabled{opacity:.55}
+.ch.on,.ch.on:disabled{border:2px solid var(--sf);background:rgba(255,159,28,.16);opacity:1}
+.real{background:linear-gradient(135deg,rgba(68,212,131,.2),rgba(255,159,28,.1));border:1px solid rgba(68,212,131,.4);border-radius:18px;padding:16px;margin:12px 0}
+.rv{font-size:clamp(24px,7vw,36px);font-weight:900}
+.rk{display:grid;grid-template-columns:36px 1fr auto;align-items:center;gap:8px;text-align:left}
+.off{opacity:.5}.sc{color:#ffd166}.gn{color:var(--gr)}
+.timer{width:72px;height:72px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:22px;background:conic-gradient(var(--sf) var(--pr),rgba(255,255,255,.12) 0);position:relative}
+.timer:after{content:"";position:absolute;inset:7px;border-radius:50%;background:#28154f}
+.timer span{position:relative;z-index:1}
+.spin{width:38px;height:38px;border-radius:50%;border:4px solid rgba(255,255,255,.15);border-top-color:var(--sf);animation:sp .8s linear infinite;margin:0 auto 14px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);background:#100c2c;border:1px solid var(--bd);padding:12px 16px;border-radius:14px;opacity:0;pointer-events:none;transition:.25s;z-index:9;max-width:90vw;text-align:center;font-weight:700}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><span>🎭 Nakli Asli</span><span><button class="ib" id="mute" title="Sound">🔊</button><button class="ib" id="leave" title="Leave room" hidden>🚪</button></span></div>
+  <main id="screen"></main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* Nakli Asli — host-authoritative bluff trivia over PeerJS (no backend).
+   The host's browser keeps ALL secrets (fakes, votes, real answer) and sends each
+   player only what they are allowed to see, so screens stay in sync and nobody can cheat. */
+
+const ICE=[
+  {urls:"stun:stun.l.google.com:19302"},
+  {urls:["turn:eu-0.turn.peerjs.com:3478","turn:us-0.turn.peerjs.com:3478"],username:"peerjs",credential:"peerjsp"},
+  {urls:["turn:openrelay.metered.ca:80","turn:openrelay.metered.ca:443","turns:openrelay.metered.ca:443?transport=tcp"],username:"openrelayproject",credential:"openrelayproject"}
+];
+const OPTS={config:{iceServers:ICE}};
+const FAKE_T=30,VOTE_T=25,MAX=8,MIN=2,REVEAL_MS=9000,BOARD_MS=5000,CONNECT_MS=20000;
+
+const Q=[
+["Which city is known as the Pink City of India?","Jaipur"],
+["Which river flows through the city of Varanasi?","Ganga"],
+["Which Indian state is home to Kaziranga National Park?","Assam"],
+["Who wrote India's national anthem, Jana Gana Mana?","Rabindranath Tagore"],
+["Who wrote the Ramcharitmanas?","Tulsidas"],
+["Who was the first Indian to win an individual Olympic gold medal?","Abhinav Bindra"],
+["Which mountain is the highest peak located entirely within India?","Nanda Devi"],
+["Who was the first Indian woman to win an Olympic medal?","Karnam Malleswari"],
+["Which festival is widely known as the Festival of Lights?","Diwali"],
+["Which festival is strongly associated with Kerala's harvest celebrations?","Onam"],
+["Which harvest festival is especially associated with Tamil Nadu?","Pongal"],
+["Which Rajasthan city is known as the City of Lakes?","Udaipur"],
+["Which state is famous for the Hornbill Festival?","Nagaland"],
+["Which Indian classical dance form originated in Kerala?","Kathakali"],
+["Which Indian classical dance form is associated with Tamil Nadu?","Bharatanatyam"],
+["Who played Kabir Khan in the film Chak De! India?","Shah Rukh Khan"],
+["Who directed the film Lagaan?","Ashutosh Gowariker"],
+["Which actor played Rancho in 3 Idiots?","Aamir Khan"],
+["Which Telugu film won the Oscar for Best Original Song for Naatu Naatu?","RRR"],
+["Who directed the Baahubali films?","S. S. Rajamouli"],
+["Which Indian cricketer is nicknamed the Master Blaster?","Sachin Tendulkar"],
+["Who captained India to victory in the 1983 Cricket World Cup?","Kapil Dev"],
+["Which Indian cricketer is nicknamed the Hitman?","Rohit Sharma"],
+["Which team won the first ICC Men's T20 World Cup in 2007?","India"],
+["Which Indian city is home to Eden Gardens cricket stadium?","Kolkata"],
+["Which green-podded spice, called elaichi in Hindi, is a classic chai flavouring?","Cardamom"],
+["Which steamed, round South Indian rice and urad dal cake is often eaten with sambar?","Idli"],
+["Which state is famous for the dish litti chokha?","Bihar"],
+["Which ancient Indian university was located in present-day Bihar?","Nalanda"],
+["Who founded the Maurya Empire?","Chandragupta Maurya"]
+];
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id),screen=$("screen");
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clean=(s,n)=>String(s||"").replace(/\s+/g," ").trim().slice(0,n);
+const norm=s=>String(s).toLowerCase().replace(/[^\p{L}\p{N}]/gu,"");
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const randCode=()=>Array.from({length:4},()=>"ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random()*26)]).join("");
+const ls={get:k=>{try{return localStorage.getItem(k)||""}catch{return""}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch{}}};
+const activeOf=s=>s.players.filter(p=>p.connected);
+const sortP=a=>[...a].sort((x,y)=>y.score-x.score||x.name.localeCompare(y.name));
+function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),3000)}
+
+/* ---------- sound ---------- */
+let ac=null,muted=ls.get("na-mute")==="1";
+$("mute").textContent=muted?"🔇":"🔊";
+$("mute").onclick=()=>{muted=!muted;ls.set("na-mute",muted?"1":"0");$("mute").textContent=muted?"🔇":"🔊"};
+function snd(name){
+  if(muted)return;
+  try{
+    ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume();
+    const seq={click:[[520,.07]],start:[[440,.1],[660,.12]],tick:[[900,.04]],err:[[200,.15]],reveal:[[523,.1],[659,.1],[784,.16]],win:[[523,.12],[659,.12],[784,.12],[1047,.3]]}[name]||[];
+    let t=ac.currentTime;
+    for(const [f,d] of seq){const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.setValueAtTime(.06,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d);t+=d}
+  }catch{}
+}
+
+/* ---------- globals ---------- */
+let peer=null,hostConn=null,isHost=false,roomCode="",myName="";
+let view=null,deadline=0,lastSK="",lastSig="";      // what this device renders
+let joined=false,joinTimer=null,joinFailFn=null,lastRx=0;   // client side
+let G=null,secrets={fakes:{},votes:{}},hostChoices=[],realAnswer="",qOrder=[],deadlineHost=0;  // host only
+const conns=new Map(),peerToPid=new Map();let lastSeen={},nextPid=1,pt=null,wd=null;
+
+let wake=null;
+async function keepAwake(){try{if("wakeLock" in navigator)wake=await navigator.wakeLock.request("screen")}catch{}}
+
+/* ---------- generic screens ---------- */
+function spinner(msg){screen.innerHTML=`<div class="card c"><div class="spin"></div><h2>${esc(msg)}</h2><div class="mu sm">This can take a few seconds.</div></div>`}
+function showMsg(title,msg,retry){
+  screen.innerHTML=`<div class="card c"><h2>😕 ${esc(title)}</h2><div class="err">${esc(msg)}</div>${retry==="rejoin"?`<button class="btn s" data-a="rejoin">🔄 Rejoin room</button>`:retry?`<button class="btn s" data-a="showJoin">🔄 Try again</button>`:""}<button class="btn g" data-a="home">🏠 Home</button></div>`;
+}
+function renderHome(){
+  view=null;lastSK=lastSig="";$("leave").hidden=true;
+  screen.innerHTML=`<div class="card c"><div style="font-size:58px">🎭</div><h1>Nakli Asli</h1>
+  <p class="mu">Fake vs Real: invent believable lies, spot the truth, fool your friends.</p>
+  <div class="acts"><button class="btn p" data-a="showCreate">✨ Create room</button><button class="btn s" data-a="showJoin">🚪 Join room</button></div>
+  <h3>How to play</h3>
+  <div class="steps">
+   <div class="box"><b>1. 🤥 Fake it</b><div class="mu sm">Read the trivia question and write a believable fake answer.</div></div>
+   <div class="box"><b>2. 🕵️ Spot it</b><div class="mu sm">Every answer is mixed with the real one. Vote for the real one.</div></div>
+   <div class="box"><b>3. 🏆 Score</b><div class="mu sm">+1000 for the real answer, +500 for each friend your fake fools.</div></div>
+  </div>
+  <div class="mu sm" style="margin-top:14px">2–8 players · no login · the host should keep their screen on</div></div>`;
+}
+function showCreate(){
+  screen.innerHTML=`<div class="card"><div class="c"><h2>✨ Create a room</h2><div class="mu">You become the host. Friends join with a 4-letter code.</div></div>
+  <div class="form"><label class="mu sm">Your name</label><input id="nm" maxlength="20" value="${esc(ls.get("na-name"))}" placeholder="e.g. Arjun" autocomplete="nickname">
+  <button class="btn p" data-a="mkroom">🎲 Create room</button><button class="btn g" data-a="home">← Back</button></div></div>`;
+}
+function showJoin(code){
+  code=String(code||"").replace(/[^a-z]/gi,"").toUpperCase().slice(0,4);
+  screen.innerHTML=`<div class="card"><div class="c"><h2>🚪 Join a room</h2><div class="mu">Enter the room code from your host.</div></div>
+  <div class="form"><label class="mu sm">Room code</label><input id="rc" class="code" maxlength="4" value="${esc(code)}" placeholder="ABCD" autocomplete="off">
+  <label class="mu sm">Your name</label><input id="nm" maxlength="20" value="${esc(ls.get("na-name"))}" placeholder="e.g. Priya" autocomplete="nickname">
+  <button class="btn s" data-a="join">🚀 Join room</button><button class="btn g" data-a="home">← Back</button></div></div>`;
+}
+function doCreate(){
+  const n=clean($("nm").value,20);if(!n)return toast("Please enter your name.");
+  ls.set("na-name",n);spinner("Creating your room…");createRoom(n);
+}
+function doJoin(){
+  const c=$("rc").value.trim().toUpperCase(),n=clean($("nm").value,20);
+  if(!/^[A-Z]{4}$/.test(c))return toast("Room code must be 4 letters.");
+  if(!n)return toast("Please enter your name.");
+  ls.set("na-name",n);connectToHost(c,n);
+}
+function leaveToHome(){
+  joined=false;clearInterval(wd);clearTimeout(pt);
+  try{peer&&peer.destroy()}catch{}
+  peer=hostConn=null;G=null;isHost=false;conns.clear();peerToPid.clear();renderHome();
+}
+
+/* ============================ HOST ============================ */
+function createRoom(name,attempt=0){
+  if(attempt>8)return showMsg("Could not create room","Could not reach the PeerJS server. Check your internet connection and try again.");
+  const code=randCode();let done=false;
+  const p=new Peer("nakliasli-"+code,OPTS);
+  const t=setTimeout(()=>{if(!done){done=true;try{p.destroy()}catch{}createRoom(name,attempt+1)}},12000);
+  p.on("open",()=>{if(done)return;done=true;clearTimeout(t);peer=p;setupHost(name,code)});
+  p.on("error",e=>{
+    if(done)return;done=true;clearTimeout(t);try{p.destroy()}catch{}
+    if(e.type==="unavailable-id")createRoom(name,attempt+1);   // code already taken: try another
+    else showMsg("Could not create room",e.message||"Connection error.");
+  });
+  p.on("disconnected",()=>{if(peer===p)try{p.reconnect()}catch{}});
+}
+const mk=(id,name)=>({id,name,score:0,connected:true,hasFake:false,hasVoted:false});
+const getP=id=>G.players.find(p=>p.id===id);
+const nameOf=id=>(getP(id)||{}).name||"?";
+
+function setupHost(name,code){
+  isHost=true;roomCode=code;myName=name;conns.clear();peerToPid.clear();lastSeen={};nextPid=1;
+  const id="p"+nextPid++;
+  G={phase:"lobby",roomCode:code,hostPid:id,players:[mk(id,name)],round:0,totalRounds:3,question:null,choices:[],reveal:null,note:""};
+  secrets={fakes:{},votes:{}};hostChoices=[];
+  peer.on("connection",c=>{c.on("data",d=>onHostData(c,d));c.on("close",()=>gone(c));c.on("error",()=>gone(c))});
+  clearInterval(wd);
+  wd=setInterval(()=>{ // drop players who stopped pinging (closed tab, lost signal)
+    for(const [pid,c] of [...conns])if(Date.now()-(lastSeen[pid]||0)>15000){conns.delete(pid);try{c.close()}catch{}left(pid)}
+  },3000);
+  keepAwake();pushState();
+}
+function viewFor(pid){
+  const mine=hostChoices.find(c=>c.author===pid);
+  return{state:G,you:pid,myFake:secrets.fakes[pid]??null,myVote:secrets.votes[pid]??null,myChoice:mine?mine.id:null};
+}
+const msLeft=()=>deadlineHost?Math.max(0,deadlineHost-Date.now()):0;
+function sendTo(pid){const c=conns.get(pid);if(c&&c.open)try{c.send({type:"state",view:viewFor(pid),ms:msLeft()})}catch{}}
+function pushState(){
+  if(!isHost||!G)return;
+  G.players.forEach(p=>{p.hasFake=p.id in secrets.fakes;p.hasVoted=p.id in secrets.votes});
+  for(const pid of conns.keys())sendTo(pid);
+  view=viewFor(G.hostPid);deadline=deadlineHost;render();
+}
+function tell(pid,m){if(pid===G.hostPid)notify(m);else{const c=conns.get(pid);if(c&&c.open)try{c.send({type:"err",m})}catch{}}}
+function notify(m){toast("⚠️ "+m);snd("err");unlock()}
+function unlock(){
+  document.querySelectorAll("[data-a=fake],#fk").forEach(x=>x.disabled=false);
+  document.querySelectorAll("[data-a=vote]").forEach(b=>b.disabled=b.dataset.own==="1");
+}
+
+function onHostData(c,d){
+  if(!d||typeof d!=="object")return;
+  if(d.type==="join")return handleJoin(c,d);
+  const pid=peerToPid.get(c.peer);
+  if(!pid||conns.get(pid)!==c)return;
+  lastSeen[pid]=Date.now();onHostAction(pid,d);
+}
+function onHostAction(pid,d){
+  if(d.type==="fake")submitFake(pid,d.text);
+  else if(d.type==="vote")submitVote(pid,d.choice);
+  else if(d.type==="ping")sendTo(pid);
+}
+function handleJoin(c,d){
+  const name=clean(d.name,20);
+  if(!name)return c.send({type:"join-error",m:"A name is required."});
+  let p=G.players.find(x=>!x.connected&&x.name.toLowerCase()===name.toLowerCase());
+  if(p){p.connected=true;c.send({type:"notice",m:`Welcome back ${p.name}! Your score was restored.`})}   // rejoin
+  else{
+    if(activeOf(G).length>=MAX){c.send({type:"join-error",m:"Room is full (8 players max)."});setTimeout(()=>{try{c.close()}catch{}},400);return}
+    let n=name,i=2;const taken=activeOf(G).map(x=>x.name.toLowerCase());
+    while(taken.includes(n.toLowerCase()))n=name.slice(0,17)+i++;
+    p=mk("p"+nextPid++,n);G.players.push(p);
+    if(n!==name)c.send({type:"notice",m:`Name taken, you joined as "${n}".`});
+  }
+  const old=conns.get(p.id);conns.set(p.id,c);peerToPid.set(c.peer,p.id);lastSeen[p.id]=Date.now();
+  if(old&&old!==c)try{old.close()}catch{}
+  pushState();
+}
+function gone(c){const pid=peerToPid.get(c.peer);if(pid&&conns.get(pid)===c){conns.delete(pid);left(pid)}}
+function left(pid){
+  const p=G&&getP(pid);if(!p||!p.connected)return;
+  if(G.phase==="lobby")G.players=G.players.filter(x=>x!==p);else p.connected=false;
+  pushState();if(!tooFew())advance();
+}
+function tooFew(){
+  if(["fake","vote","reveal","leaderboard"].includes(G.phase)&&activeOf(G).length<MIN){
+    clearTimeout(pt);deadlineHost=0;G.phase="winner";G.note="Not enough players left to continue.";pushState();return true;
+  }
+  return false;
+}
+
+/* ---------- game flow (host) ---------- */
+function sched(fn,ms){clearTimeout(pt);pt=setTimeout(fn,ms)}
+function startGame(){
+  if(!isHost||G.phase!=="lobby")return;
+  if(activeOf(G).length<MIN)return toast(`At least ${MIN} players are needed.`);
+  qOrder=shuffle(Q.map((_,i)=>i)).slice(0,G.totalRounds);
+  G.players.forEach(p=>p.score=0);G.round=1;beginRound();
+}
+function beginRound(){
+  secrets={fakes:{},votes:{}};hostChoices=[];G.choices=[];G.reveal=null;
+  const q=Q[qOrder[G.round-1]];G.question=q[0];realAnswer=q[1];
+  G.phase="fake";deadlineHost=Date.now()+FAKE_T*1000;pushState();sched(startVoting,FAKE_T*1000);
+}
+function submitFake(pid,text){
+  const p=G.players.find(x=>x.id===pid);
+  if(G.phase!=="fake"||!p||!p.connected||pid in secrets.fakes)return;
+  const t=clean(text,120);
+  if(!norm(t))return tell(pid,"Type a fake answer first.");
+  if(norm(t)===norm(realAnswer))return tell(pid,"That's the real answer! Try a different fake.");
+  if(Object.values(secrets.fakes).some(f=>norm(f)===norm(t)))return tell(pid,"Someone already used that fake. Try another!");
+  secrets.fakes[pid]=t;pushState();advance();
+}
+function startVoting(){
+  if(G.phase!=="fake")return;
+  const items=[{author:null,text:realAnswer}];
+  G.players.forEach(p=>{if(p.id in secrets.fakes)items.push({author:p.id,text:secrets.fakes[p.id]})});
+  hostChoices=shuffle(items).map((c,i)=>({...c,id:"c"+i}));
+  G.choices=hostChoices.map(c=>({id:c.id,text:c.text}));   // no author / real flag sent to players
+  G.phase="vote";deadlineHost=Date.now()+VOTE_T*1000;pushState();sched(startReveal,VOTE_T*1000);
+}
+function submitVote(pid,cid){
+  const p=G.players.find(x=>x.id===pid),c=hostChoices.find(x=>x.id===cid);
+  if(G.phase!=="vote"||!p||!p.connected||pid in secrets.votes)return;
+  if(!c)return tell(pid,"That option isn't available.");
+  if(c.author===pid)return tell(pid,"You can't vote for your own fake!");
+  secrets.votes[pid]=cid;pushState();advance();
+}
+function advance(){
+  if(G.phase==="fake"&&activeOf(G).every(p=>p.id in secrets.fakes))startVoting();
+  else if(G.phase==="vote"&&activeOf(G).every(p=>p.id in secrets.votes))startReveal();
+}
+function startReveal(){
+  if(G.phase!=="vote")return;
+  const changes={},voters={};G.players.forEach(p=>changes[p.id]=0);
+  for(const [v,cid] of Object.entries(secrets.votes)){
+    const c=hostChoices.find(x=>x.id===cid);if(!c)continue;
+    (voters[cid]=voters[cid]||[]).push(nameOf(v));
+    if(c.author===null)changes[v]+=1000;else changes[c.author]+=500;   // +1000 real, +500 per fooled player
+  }
+  G.players.forEach(p=>p.score+=changes[p.id]||0);
+  G.reveal={changes,items:hostChoices.map(c=>({text:c.text,real:c.author===null,author:c.author?nameOf(c.author):null,v:voters[c.id]||[]}))
+    .sort((a,b)=>b.real-a.real||b.v.length-a.v.length)};
+  G.phase="reveal";deadlineHost=0;pushState();sched(afterReveal,REVEAL_MS);
+}
+function afterReveal(){
+  if(G.round>=G.totalRounds){G.phase="winner";pushState();return}
+  G.phase="leaderboard";pushState();sched(()=>{G.round++;beginRound()},BOARD_MS);
+}
+function playAgain(){
+  if(!isHost||G.phase!=="winner")return;
+  clearTimeout(pt);G.players=G.players.filter(p=>p.connected);G.players.forEach(p=>p.score=0);
+  Object.assign(G,{phase:"lobby",round:0,question:null,choices:[],reveal:null,note:""});
+  secrets={fakes:{},votes:{}};hostChoices=[];deadlineHost=0;pushState();
+}
+
+/* ============================ CLIENT ============================ */
+function connectToHost(code,name){
+  roomCode=code;myName=name;joined=false;spinner(`Finding room ${code}…`);
+  const p=new Peer(undefined,OPTS);let over=false;
+  const fail=m=>{if(over||joined)return;over=true;clearTimeout(joinTimer);try{p.destroy()}catch{}showMsg("Could not join",m,1)};
+  joinFailFn=fail;
+  joinTimer=setTimeout(()=>fail("Timed out. Check the room code and make sure the host still has the game open."),CONNECT_MS);
+  p.on("open",()=>{
+    const c=p.connect("nakliasli-"+code,{reliable:true,serialization:"json"});hostConn=c;
+    c.on("open",()=>{peer=p;lastRx=Date.now();c.send({type:"join",name})});
+    c.on("data",d=>{if(!over)onClientData(d)});
+    c.on("close",hostGone);
+    c.on("error",()=>fail("Could not connect to the host."));
+  });
+  p.on("error",e=>fail(e.type==="peer-unavailable"?"Room not found. Check the code, and make sure the host has already created the room.":(e.message||"Connection error.")));
+}
+function onClientData(d){
+  lastRx=Date.now();
+  if(d.type==="state"){
+    if(!joined){joined=true;clearTimeout(joinTimer);isHost=false;keepAwake()}
+    view=d.view;deadline=Date.now()+d.ms;render();
+  }else if(d.type==="err")notify(d.m);
+  else if(d.type==="notice")toast("🎉 "+d.m);
+  else if(d.type==="join-error"&&joinFailFn)joinFailFn(d.m);
+}
+function hostGone(){
+  if(!joined||isHost)return;
+  joined=false;try{peer.destroy()}catch{}view=null;lastSK="";$("leave").hidden=true;
+  showMsg("Disconnected from the host","The host may have left, or your connection dropped. If the game is still running, tap Rejoin and your score will be restored.","rejoin");
+}
+setInterval(()=>{ // client heartbeat: keeps state fresh and detects a dead host
+  if(isHost||!joined)return;
+  if(Date.now()-lastRx>20000)return hostGone();
+  if(hostConn&&hostConn.open)try{hostConn.send({type:"ping"})}catch{}
+},4000);
+
+/* ============================ RENDER ============================ */
+function act(m){if(isHost)onHostAction(G.hostPid,m);else if(hostConn&&hostConn.open)hostConn.send(m)}
+function status(){
+  const s=view.state,a=activeOf(s);
+  if(s.phase==="lobby"){const n=MIN-a.length;return n>0?`Waiting for ${n} more player${n>1?"s":""}…`:`${a.length} players ready 🎉`}
+  if(s.phase==="fake"){const w=a.filter(p=>!p.hasFake).length;return w?`Waiting for ${w} more fake${w>1?"s":""}…`:"All fakes are in!"}
+  if(s.phase==="vote"){const w=a.filter(p=>!p.hasVoted).length;return w?`Waiting for ${w} more vote${w>1?"s":""}…`:"All votes are in!"}
+  return "";
+}
+function render(){
+  if(!view)return;
+  const s=view.state;
+  /* Only rebuild the screen when something the player can act on changes; otherwise just
+     refresh the status line, so typed text and taps are never wiped mid-round. */
+  const sk=(s.phase==="fake"||s.phase==="vote")?JSON.stringify([s.phase,s.round,s.question,s.choices,view.you,view.myFake,view.myVote,view.myChoice]):JSON.stringify(view);
+  if(sk===lastSK){const st=$("st");if(st)st.textContent=status();return}
+  lastSK=sk;
+  const sig=s.phase+s.round;
+  if(sig!==lastSig){lastSig=sig;const m={fake:"start",vote:"start",reveal:"reveal",winner:"win"}[s.phase];if(m)snd(m)}
+  ({lobby:rLobby,fake:rFake,vote:rVote,reveal:rReveal,leaderboard:rBoard,winner:rWinner})[s.phase]();
+  $("leave").hidden=false;
+}
+const secLeft=()=>Math.max(0,(deadline-Date.now())/1000);
+const timer=(sec,tot)=>`<div class="timer" id="tm" style="--pr:${sec/tot*100}%"><span>${Math.ceil(sec)}</span></div>`;
+function rank(ps,delta){
+  return`<div class="pl" style="margin:14px 0">${sortP(ps).map((p,i)=>`<div class="box rk ${p.connected?"":"off"}"><span>${["🥇","🥈","🥉"][i]||i+1}</span><b>${esc(p.name)}${p.id===view.you?" (you)":""}${delta&&p.d?` <small class="gn">+${p.d}</small>`:""}</b><b class="sc">${p.score}</b></div>`).join("")}</div>`;
+}
+function rLobby(){
+  const s=view.state;
+  screen.innerHTML=`<div class="card"><div class="row"><div><h2>🏠 Lobby</h2><div class="mu">Share this code with friends</div></div><div class="rc">${esc(s.roomCode)}</div></div>
+  <button class="btn s" data-a="copy">🔗 Copy invite link</button>
+  <div class="mu c sm" id="st" style="margin:12px 0">${esc(status())}</div>
+  <div class="pl">${s.players.map(p=>`<div class="box">👤 <b>${esc(p.name)}</b>${p.id===s.hostPid?" 👑":""}${p.id===view.you?" (you)":""}</div>`).join("")}</div>
+  ${isHost?`<h3>Rounds</h3><div class="rnd">${[3,5,8].map(n=>`<button class="${s.totalRounds===n?"on":""}" data-a="rounds" data-n="${n}">${n}</button>`).join("")}</div>
+  <button class="btn p" data-a="start" ${activeOf(s).length<MIN?"disabled":""}>🎮 Start game</button>`:`<div class="box c mu" style="margin-top:14px">⏳ Waiting for the host to start…</div>`}</div>`;
+}
+function rFake(){
+  const s=view.state,done=view.myFake!==null;
+  screen.innerHTML=`<div class="card"><div class="row"><div><div class="mu sm">Round ${s.round} of ${s.totalRounds}</div><h2>🤥 Write a fake</h2></div>${timer(secLeft(),FAKE_T)}</div>
+  <div class="q">${esc(s.question)}</div>
+  ${done?`<div class="ok">✅ Fake locked in: <b>${esc(view.myFake)}</b><br>Waiting for the others…</div>`
+  :`<input id="fk" maxlength="120" placeholder="Type a believable fake answer" autocomplete="off"><button class="btn p" data-a="fake">🚀 Submit fake</button>`}
+  <div class="mu c sm" id="st" style="margin-top:14px">${esc(status())}</div></div>`;
+  if(!done)$("fk").focus();
+}
+function rVote(){
+  const s=view.state,v=view.myVote;
+  screen.innerHTML=`<div class="card"><div class="row"><div><div class="mu sm">Round ${s.round} of ${s.totalRounds}</div><h2>🕵️ Which is real?</h2></div>${timer(secLeft(),VOTE_T)}</div>
+  <div class="q">${esc(s.question)}</div>
+  ${s.choices.map(c=>{const own=c.id===view.myChoice;return`<button class="ch ${v===c.id?"on":""}" data-a="vote" data-id="${esc(c.id)}" data-own="${own?1:0}" ${v||own?"disabled":""}>${esc(c.text)}${own?" <small class='mu'>(your fake)</small>":""}</button>`}).join("")}
+  ${v?`<div class="ok" style="margin-top:12px">🔒 Vote locked. Waiting for the others…</div>`:""}
+  <div class="mu c sm" id="st" style="margin-top:14px">${esc(status())}</div></div>`;
+}
+function rReveal(){
+  const s=view.state,r=s.reveal;
+  screen.innerHTML=`<div class="card"><div class="c mu sm">Round ${s.round} reveal</div>
+  ${r.items.map(i=>i.real?`<div class="real"><div class="sm">🌟 REAL ANSWER</div><div class="rv">${esc(i.text)}</div><div class="sm">Found by: ${esc(i.v.join(", ")||"nobody 😭")}</div></div>`
+  :`<div class="box" style="margin-top:10px"><b>“${esc(i.text)}”</b><div class="mu sm">✍️ ${esc(i.author)} · fooled: ${esc(i.v.join(", ")||"nobody")}</div></div>`).join("")}
+  <h3>Round points</h3>${rank(s.players.map(p=>({...p,d:r.changes[p.id]||0})),true)}
+  <div class="mu c sm">Next screen coming up…</div></div>`;
+}
+function rBoard(){
+  const s=view.state;
+  screen.innerHTML=`<div class="card c"><div class="mu sm">Round ${s.round} of ${s.totalRounds} complete</div><h2>🏆 Leaderboard</h2>${rank(s.players)}<div class="mu sm">Round ${s.round+1} starts shortly…</div></div>`;
+}
+function rWinner(){
+  const s=view.state,t=sortP(s.players),top=t[0]?t[0].score:0,w=t.filter(p=>p.score===top).map(p=>p.name);
+  screen.innerHTML=`<div class="card c"><div style="font-size:58px">👑</div><div class="mu sm">Game over</div><h2>${w.length>1?"Champions":"Champion"}</h2><h1>${esc(w.join(" & "))}</h1>
+  <div class="sc" style="font-size:22px;font-weight:900;margin:8px 0">${top} points</div>
+  ${s.note?`<div class="err">${esc(s.note)}</div>`:""}${rank(s.players)}
+  ${isHost?`<button class="btn p" data-a="again">🔄 Play again</button>`:`<div class="box mu">⏳ Waiting for the host to start another game…</div>`}</div>`;
+}
+
+/* ---------- events ---------- */
+async function copyInvite(){
+  const u=location.href.split(/[?#]/)[0]+"?room="+roomCode;
+  try{await navigator.clipboard.writeText(u);toast("🔗 Invite link copied!")}catch{prompt("Copy this invite link:",u)}
+}
+function sendFake(){
+  const i=$("fk"),t=clean(i&&i.value,120);if(!t)return toast("✍️ Type a fake answer first.");
+  i.disabled=true;document.querySelector("[data-a=fake]").disabled=true;act({type:"fake",text:t});
+}
+function sendVote(id){document.querySelectorAll("[data-a=vote]").forEach(b=>b.disabled=true);act({type:"vote",choice:id})}
+const A={
+  home:renderHome,showCreate,showJoin:()=>showJoin(),mkroom:doCreate,join:doJoin,copy:copyInvite,start:startGame,again:playAgain,fake:sendFake,
+  rejoin:()=>connectToHost(roomCode,myName),
+  rounds:el=>{G.totalRounds=+el.dataset.n;pushState()},
+  vote:el=>sendVote(el.dataset.id)
+};
+document.addEventListener("click",e=>{const el=e.target.closest("[data-a]");if(!el||el.disabled)return;snd("click");const f=A[el.dataset.a];if(f)f(el)});
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Enter")return;const id=e.target.id;
+  if(id==="fk")sendFake();
+  else if(id==="nm"||id==="rc"){const b=document.querySelector("[data-a=mkroom],[data-a=join]");if(b)b.click()}
+});
+$("leave").onclick=()=>{if(confirm(isHost?"Close the room for everyone?":"Leave this room?"))leaveToHome()};
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&(isHost||joined)){keepAwake();if(!isHost&&hostConn&&hostConn.open)try{hostConn.send({type:"ping"})}catch{}}});
+window.addEventListener("beforeunload",()=>{try{peer&&peer.destroy()}catch{}});
+
+/* countdown ring + last-5-seconds tick (uses time received from host, so device clocks don't matter) */
+let lastTick=-1;
+setInterval(()=>{
+  const t=$("tm");if(!t||!view)return;
+  const tot=view.state.phase==="fake"?FAKE_T:VOTE_T,sec=secLeft(),c=Math.ceil(sec);
+  t.style.setProperty("--pr",sec/tot*100+"%");t.querySelector("span").textContent=c;
+  if(c!==lastTick){lastTick=c;if(c>0&&c<=5)snd("tick")}
+},250);
+
+/* ---------- start ---------- */
+renderHome();
+const inviteCode=new URLSearchParams(location.search).get("room");
+if(inviteCode)showJoin(inviteCode);
+</script>
+</body>
+</html>
